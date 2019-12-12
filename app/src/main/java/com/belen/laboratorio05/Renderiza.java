@@ -219,10 +219,10 @@ public class Renderiza extends GLSurfaceView implements Renderer {
 		obj.dibuja(gl);
 		gl.glPopMatrix();
 
-		//gl.glPushMatrix();
+		gl.glPushMatrix();
 		if (estaBienElModelo) {
 			gl.glPushMatrix();
-			gl.glTranslatef(2f, 2f, -4f);
+			gl.glTranslatef(8f, 6f, -4f);
 			gl.glRotatef(-angulo, 0.0f, 1.0f, 0.0f);
 			gl.glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
 			gl.glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
@@ -233,7 +233,7 @@ public class Renderiza extends GLSurfaceView implements Renderer {
 
 		if (estaBienElModeloc) {
 			gl.glPushMatrix();
-			gl.glTranslatef(5.5f, 3.5f, -5f);
+			gl.glTranslatef(-15f, -2f, 10f);
 			gl.glRotatef(-angulo, 0.0f, 1.0f, 0.0f);
 			gl.glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
 			gl.glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
@@ -244,7 +244,7 @@ public class Renderiza extends GLSurfaceView implements Renderer {
 
 		if (estaBienElModeloc1) {
 			gl.glPushMatrix();
-			gl.glTranslatef(5.5f, 3.5f, -3f);
+			gl.glTranslatef(5.5f, 2f, 8f);
 			gl.glRotatef(-angulo, 0.0f, 1.0f, 0.0f);
 			gl.glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
 			gl.glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
@@ -252,9 +252,9 @@ public class Renderiza extends GLSurfaceView implements Renderer {
 			md2c1.dibuja(gl);
 			gl.glPopMatrix();
 		}
-		//gl.glPopMatrix();
 		gl.glPopMatrix();
-		gl.glPopMatrix();
+//		gl.glPopMatrix();
+//		gl.glPopMatrix();
 
 		angulo = angulo + 0.7f;
 		if (angulo > 360) {
