@@ -1,56 +1,55 @@
 package com.belen.laboratorio05;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.opengl.GLUtils;
-import android.util.Log;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
-
 import javax.microedition.khronos.opengles.GL10;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.opengl.GLUtils;
+import android.util.Log;
+
 
 /**
  * Clase Terreno (OpenGL 1.x)
- * 
+ *
  * @author Jhonny Felipez
  * @version 1.0 02/04/2016
- * 
+ *
  */
 public class Terreno {
-	
+
 	/* C�digo o handle de la textura */
 	int codigoTextura[] = new int[1];
-	
+
 	/* Ancho y alto del archivo RAW */
 	private int anchoRAW;
 	private int altoRAW;
-	
+
 	private FloatBuffer bufVertices;
 	private FloatBuffer bufNormales;
 	private FloatBuffer bufTextura;
 	private ByteBuffer bufByte;
 
 	public Terreno(GL10 gl, Context contexto, String nombreDeArchivoRAW, String nombreDeArchivoDeTextura) {
-		
+
 		/* Lee el archivo de la Textura */
-		
+
 		leeTextura(gl, contexto, nombreDeArchivoDeTextura);
-		
+
 		/* Lee el archivo .RAW */
 
 		ArrayList<Integer> datoByte = new ArrayList<Integer>();
-		
+
 		int tam = leeArchivoRAW(contexto, nombreDeArchivoRAW, datoByte);
-			
+
 		anchoRAW = (int) Math.sqrt(tam);
 		altoRAW = (int) Math.sqrt(tam);
-		
+
 		/* Lee las altitudes */
 
 		float altitud[][] = new float[altoRAW][anchoRAW];
@@ -64,15 +63,15 @@ public class Terreno {
 				altitud[z][x] = a;
 			}
 		}
-		
+
 		/* Obtiene la normal de cada v�rtice */
-			
+
 		Vector3 suma; 					// vector suma
 		Vector3 norte = new Vector3(); 	// vector norte
 		Vector3 sur = new Vector3(); 	// vector sur
 		Vector3 este = new Vector3(); 	// vector este
 		Vector3 oeste = new Vector3(); 	// vector oeste
-		
+
 		/**
 		 *   Direcci�n de los vectores
 		 *
@@ -81,9 +80,9 @@ public class Terreno {
 		 *     <----+---->
 		 *     O    |    E
 		 *          v S
-		 *             
+		 *
 		 */
-		
+
 		for (int z = 0; z < altoRAW; z++) {
 			for (int x = 0; x < anchoRAW; x++) {
 				suma = new Vector3();
@@ -128,15 +127,15 @@ public class Terreno {
 				normales2[z][x] = suma.normaliza();
 			}
 		}
-		
+
 		/*
 		 * Suaviza las normales.
 		 * Sumando las normales de los cuatro v�rtices adyacentes.
 		 */
-			
+
 		/**
 		 *     N = Normal de f
-		 *     
+		 *
 		 *           c
 		 *           | 
 		 *           | 
@@ -144,46 +143,46 @@ public class Terreno {
 		 *           |
 		 *           |
 		 *           d
-		 *           
+		 *
 		 *     N = a + b + c + d
 		 *     del v�rtice f  
 		 */
 
 		for(int z = 0; z < altoRAW; z++) {
 			for(int x = 0; x < anchoRAW; x++) {
-				
+
 				suma = normales2[z][x];
-				
+
 				// Suma la normal del vertice a
 				if (0 < x) {
 					suma = suma.mas(normales2[z][x - 1]);
 				}
-				
+
 				// Suma la normal del vertice b
 				if (x < anchoRAW - 1) {
 					suma = suma.mas(normales2[z][x + 1]);
 				}
-				
+
 				// Suma la normal del vertice c
 				if (0 < z) {
 					suma = suma.mas(normales2[z - 1][x]);
 				}
-				
+
 				// Suma la normal del vertice d
 				if (z < altoRAW - 1) {
 					suma = suma.mas(normales2[z + 1][x]);
 				}
-				
+
 				// Finalmente se vuelve a normalizar
 				// para encontrar la normal del v�rtice f
 				if (suma.longitud() == 0)
 					normales1[z][x] = new Vector3(0.0f, 1.0f, 0.0f);
 				else {
-					normales1[z][x] = suma.normaliza(); 
+					normales1[z][x] = suma.normaliza();
 				}
 			}
 		}
-		
+
 		/* Lee los v�rtices y las normales para renderizar */
 
 		/**
@@ -193,19 +192,19 @@ public class Terreno {
 		 *     |/    |
 		 *    V1    V3
 		 */
-		
+
 		bufByte = ByteBuffer.allocateDirect(tam * 6 * 4);
 		bufByte.order(ByteOrder.nativeOrder());
 		bufVertices = bufByte.asFloatBuffer();
-		
+
 		bufByte = ByteBuffer.allocateDirect(tam * 6 * 4);
 		bufByte.order(ByteOrder.nativeOrder());
 		bufNormales = bufByte.asFloatBuffer();
-		
+
 		bufByte = ByteBuffer.allocateDirect(tam * 4 * 4);
 		bufByte.order(ByteOrder.nativeOrder());
 		bufTextura = bufByte.asFloatBuffer();
-		
+
 		for (int z = 0; z < altoRAW - 1; z++) {
 			for (int x = 0; x < anchoRAW; x++) {
 				bufNormales.put(normales1[z][x].x);
@@ -231,7 +230,7 @@ public class Terreno {
 		bufNormales.rewind();
 		bufTextura.rewind();
 	}
-	
+
 	/* Retorna el ancho del archivo */
 	public int getAncho() {
 		return anchoRAW;
@@ -241,24 +240,24 @@ public class Terreno {
 	public int getAlto() {
 		return altoRAW;
 	}
-	
+
 	public void dibuja(GL10 gl) {
 
 		/* Se habilita el acceso al arreglo de v�rtices */
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-		
+
 		/* Se habilita el acceso al arreglo de las normales */
 		gl.glEnableClientState(GL10.GL_NORMAL_ARRAY);
-		
+
 		/* Se habilita el acceso al arreglo de las coordenadas de textura */
 		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-		
+
 		/* Se especifica los datos del arreglo de v�rtices */
 		gl.glVertexPointer(3, GL10.GL_FLOAT, 0, bufVertices);
-		
+
 		/* Se especifica los datos del arreglo de las normales */
 		gl.glNormalPointer(GL10.GL_FLOAT, 0, bufNormales);
-		
+
 		/* Se especifica los datos del arreglo de las coordenadas de textura */
 		gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, bufTextura);
 
@@ -274,9 +273,9 @@ public class Terreno {
 		gl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
 		gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 	}
-	
+
 	public int leeArchivoRAW(Context contexto, String nombreDeArchivo, ArrayList<Integer> datoByte) {
-	
+
 		int tam = 0;
 		try {
 			byte[] buffer = new byte[1000];
@@ -304,16 +303,16 @@ public class Terreno {
 		}
 		return tam;
 	}
-	
+
 	/* Retorna el handle del archivo de textura */
 	public int getCodigoTextura() {
 		return codigoTextura[0];
 	}
 
-	
+
 	/**
 	 * Lee la textura
-	 * 
+	 *
 	 * @param gl - El contexto GL
 	 * @param contexto - El contexto de la Actividad
 	 */
@@ -341,7 +340,7 @@ public class Terreno {
 			 * peque�a */
 			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER,
 					GL10.GL_NEAREST);
-			
+
 			/* Para repetir la textura tanto en s y t fuera del rango del 0 al 1
 			 * POR DEFECTO! */
 			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S,
@@ -354,7 +353,7 @@ public class Terreno {
 //					GL10.GL_CLAMP_TO_EDGE);
 //			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,
 //					GL10.GL_CLAMP_TO_EDGE);
-			
+
 			/* Determina la formato y el tipo de la textura. Carga la textura en
 			 * el buffer de textura */
 			GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, textura, 0);
